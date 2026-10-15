@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Income Tax Calculator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-shell">
+    <main class="calculator-page">
+      <header class="page-header">
+        <div>
+          <h1>Income Tax Calculator</h1>
+          <p class="subtitle">All rights reserved by Jyotisourav</p>
+        </div>
+        <button class="disclaimer-btn" id="disclaimerBtn" type="button">
+          <span class="warning-icon">⚠</span> Disclaimer
+        </button>
+      </header>
+
+      <div class="info-banner">
+        <span class="info-icon">i</span>
+        <span>As per Income-tax Act, 2025 (Amended by Finance Act, 2026)</span>
+      </div>
+
+      <section class="calculator-card">
+        <div class="mandatory-note"><span>*</span> Indicates mandatory fields</div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="taxYear">Tax year <span>*</span></label>
+            <select id="taxYear">
+              <option value="2026-27">2026-27</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="taxPayer">Tax payer <span>*</span></label>
+            <select id="taxPayer">
+              <option value="individual">Individual</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="ageCategory">Category (age) <span>*</span></label>
+            <select id="ageCategory">
+              <option value="">Select</option>
+              <option value="below60">Below 60 years</option>
+              <option value="60to79">60 to 79 years</option>
+              <option value="80plus">80 years or above</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="residentialStatus">Residential status <span>*</span></label>
+            <select id="residentialStatus">
+              <option value="">Select</option>
+              <option>Resident</option>
+              <option>Non-Resident</option>
+              <option>Resident but Not Ordinarily Resident</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="regime-section">
+          <div class="section-title">
+            <span>Choose tax regime <span class="required">*</span></span>
+            <span class="section-help">Select one regime to calculate your tax</span>
+          </div>
+
+          <div class="regime-cards">
+            <label class="regime-card selected" id="newRegimeCard">
+              <input type="radio" name="regime" value="new" checked>
+              <span class="radio-dot"></span>
+              <span class="regime-content">
+                <strong>New Tax Regime</strong>
+                <small>Default regime • Section 202</small>
+              </span>
+              <span class="recommended-badge">Default</span>
+            </label>
+
+            <label class="regime-card" id="oldRegimeCard">
+              <input type="radio" name="regime" value="old">
+              <span class="radio-dot"></span>
+              <span class="regime-content">
+                <strong>Old Tax Regime</strong>
+                <small>Existing slab rates with eligible deductions</small>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="income-section">
+          <div class="field income-field">
+            <label for="taxableIncome">Net taxable income <span>*</span>
+              <span class="tooltip" title="Enter your total taxable income after eligible deductions and exemptions.">i</span>
+            </label>
+            <div class="money-input">
+              <span>₹</span>
+              <input id="taxableIncome" type="number" min="0" step="1000" placeholder="Enter amount">
+            </div>
+            <small class="field-hint">Enter annual taxable income in Indian Rupees.</small>
+            <div class="error" id="incomeError"></div>
+          </div>
+        </div>
+
+        <div class="old-regime-note" id="oldRegimeNote">
+          <strong>Old regime:</strong> Enter income after applying the deductions/exemptions you are eligible to claim.
+        </div>
+
+        <div class="button-row">
+          <button class="calculate-btn" id="calculateBtn" type="button">Calculate</button>
+          <button class="reset-btn" id="resetBtn" type="button">Reset</button>
+        </div>
+      </section>
+
+      <!-- Result section is intentionally below the Calculate button -->
+      <section class="results-section hidden" id="resultsSection">
+        <div class="results-header">
+          <div>
+            <p class="results-eyebrow">Calculation summary</p>
+            <h2>Your Tax Calculation</h2>
+          </div>
+          <span class="regime-pill" id="resultRegime">New Tax Regime</span>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <span>Net taxable income</span>
+            <strong id="resultIncome">₹0</strong>
+          </div>
+          <div class="summary-card">
+            <span>Income tax</span>
+            <strong id="resultIncomeTax">₹0</strong>
+          </div>
+          <div class="summary-card">
+            <span>Surcharge</span>
+            <strong id="resultSurcharge">₹0</strong>
+          </div>
+          <div class="summary-card">
+            <span>Health & education cess</span>
+            <strong id="resultCess">₹0</strong>
+          </div>
+        </div>
+
+        <div class="total-card">
+          <div>
+            <span>Total tax liability</span>
+            <small id="resultEffectiveRate">Effective rate: 0%</small>
+          </div>
+          <strong id="resultTotal">₹0</strong>
+        </div>
+
+        <div class="rebate-message" id="rebateMessage"></div>
+
+        <div class="slab-table-wrap">
+          <h3>Tax slab used</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Income range</th>
+                <th>Tax rate</th>
+              </tr>
+            </thead>
+            <tbody id="slabTableBody"></tbody>
+          </table>
+        </div>
+
+        <p class="result-disclaimer">
+          This calculator is for general estimation only. Special-rate income, capital gains,
+          marginal relief, specific exemptions, and other provisions may require a separate calculation.
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal hidden" id="disclaimerModal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose" type="button">&times;</button>
+      <h2>Disclaimer</h2>
+      <p>
+        This calculator provides an indicative estimate based on the tax slabs and basic
+        surcharge/cess rules configured for tax year 2026-27. It is not a substitute for
+        professional tax advice or an official income-tax computation.
+      </p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
